@@ -1,0 +1,1333 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Click With Friends!</title>
+  <script src="http://cdnjs.cloudflare.com/ajax/libs/processing.js/1.4.8/processing.min.js"></script>
+  <script src="CWF_data"></script>
+</head>
+<body>
+  <canvas id="canvas"></canvas>
+
+  <script>
+    var canvas = document.getElementById("canvas");
+    var processing = new Processing(canvas, function(processing) {
+        processing.size(400, 400);
+        processing.background(0xFFF);
+
+        var mouseIsPressed = false;
+        processing.mousePressed = function () { mouseIsPressed = true; };
+        processing.mouseReleased = function () { mouseIsPressed = false; };
+
+        var keyIsPressed = false;
+        processing.keyPressed = function () { keyIsPressed = true; };
+        processing.keyReleased = function () { keyIsPressed = false; };
+
+        function getImage(s) {
+            var url = "https://www.kasandbox.org/programming-images/" + s + ".png";
+            processing.externals.sketch.imageCache.add(url);
+            return processing.loadImage(url);
+        }
+
+        // use degrees rather than radians in rotate function
+        var rotateFn = processing.rotate;
+        processing.rotate = function (angle) {
+            rotateFn(processing.radians(angle));
+        };
+        /*
+        var mouse = {
+            get x() {
+                return mouseX * 400 / 800;
+            },
+            get y() {
+                return mouseY * 400 / 800;
+            },
+            set x(x) {
+                mouseX= x * 800 / 400;
+            },
+            set y(y) {
+                mouseY = y * 800 / 400;
+            }
+        };
+        */
+        with (processing) {
+  var bonus = 0;
+  var xType = false;
+  var xType2 = false;
+  var logMessage = 600;
+  var logMove = 0;
+  var loggedIn = false;
+  var bars = [];
+  var screens = [];
+  var waves = [];
+  var name = [];
+  var user = [];
+  var loadStuffs = [["M",'r','W','i','j','i'],132,15,343,43,21];
+  var password = "powerfluff";
+  var mode = [null,"classic","push","reverse"];
+  var computer = {
+      "level":0,
+      "stars":0,
+      "nextstars":2
+  };
+  var responce = {
+      "good": ["Amazing!","Great Job!","Fantastic!","Superb!","Mind Blowing!"],
+      "bad": ["Better Luck Next Time!","Nice Try!","Almost there!"]
+  };
+  var type = 2;
+  var shake = 0;
+  var globalClickAi = 0;
+  var stars = [];
+  var but = [];
+  var backdrop = [];
+  var nameX = -200;
+  var time = 30;
+  var done = false;
+  var fade = 0;
+  var S = -1;
+  var clickS = 0;
+  var stat = {
+      "clickSpeed": [],
+      "clicks": [],
+      "wins": 0,
+      "loses": 0,
+      "level":0,
+      "Stars": 0,
+      "NextStar": 2
+  };
+  var fade2 = 0;
+  var fade3 = 0;
+  var fade4 = 255;
+  var aiClicks = 0;
+  var countDown = 3;
+  var aiMin = 10;
+  var menu = true;
+  var CURSOR = ARROW;
+  var keys = [];
+  var nameKeyCurrent = 0;
+  var alphebet = ['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','y','x','z'];
+  keyPressed = function(){
+      keys[keyCode] = true;
+  };
+  keyReleased = function(){
+      keys[keyCode] = false;
+  };
+  var findKey = function(){
+      keyPressed = function(){
+      if (key.code!==BACKSPACE && name.length < 10 && xType === false){
+              name.push(key);
+          }else
+          if (key.code===BACKSPACE && xType === false){
+              name.pop();
+          }
+      };
+  };
+  var findKey2 = function(){
+      keyPressed = function(){
+      if (key.code!==BACKSPACE && user.length < 10 && xType2 === false){
+              user.push(key);
+          }else
+          if (key.code===BACKSPACE && xType2 === false){
+              user.pop();
+          }
+      };
+  };
+  var falling = {
+      "one": 300,
+      "two": -100,
+      "three": 100
+  };
+  var hasC = false;
+  var player = {
+        "saved" : 0,
+        "one": 0,
+        "two": 0,
+        "pushOne": 0,
+        "pushTwo": 0,
+        "po": 0,
+        "pt": 0,
+        "glowOne": 0,
+        "glowTwo": 0,
+        "oneLimit": 0,
+        "twoLimit": 0,
+        "fall" : -160
+  };
+  var coolBackground = function(x,y){
+      this.x=x;
+      this.y=y;
+      this.r = 0;
+      this.pulse = 0;
+      this.alpha = 0;
+      this.r2 = 0;
+      this.r3 = 0;
+      this.ymove = 0;
+  };
+  coolBackground.prototype.draw = function() {
+      if(this.y > 400){
+          this.y=-30;
+      }
+      this.y+=0.9;
+      this.r2 = random(-1,500);
+      this.r3 = random(-1,10);
+      this.pulse+=this.alpha;
+      this.alpha/=1.1;
+
+      if(this.alpha > 50){
+          this.alpha = 50;
+      }
+      if(this.r3 < 0){
+          this.alpha+=10;
+      }
+      if(this.r2 < 0){
+          this.r+=400;
+          this.alpha = 100;
+      }
+      this.r/=1.1;
+      rectMode(CENTER);
+      fill(207, 207, 207, 50+this.alpha);
+      noStroke();
+      pushMatrix();
+      translate(this.x+25,this.y+25);
+      rotate(this.r);
+      rect(0,0,25,25,4);
+      popMatrix();
+      stroke(0, 0, 0);
+      rectMode(LEFT);
+  };
+  var boom = function(x,y){
+      this.x=x;this.y=y;
+      this.expand = 0;
+  };
+  boom.prototype.draw = function() {
+      fill(120, 120, 120,255-this.expand);
+      stroke(120, 120, 120,255-this.expand);
+      ellipse(this.x,this.y,this.expand,this.expand);
+      this.expand+=10;
+  };
+  var screenFlick = function(i){
+    this.setUp = false;
+    this.xR = random(-1,1);
+    this.yR = random(-1,1);
+    this.x = 401;
+    this.y = 0;
+    this.f =0;
+    this.i = i;
+  };
+  screenFlick.prototype.draw = function() {
+      if(this.i === 0){
+      this.f+=1;
+
+      this.x-=this.f;
+      fill(255, 255, 255);
+      stroke(255, 255, 255);
+      rect(this.x,this.y-5,400,410);
+      if(this.x < -600){
+          screens = [];
+      }
+      }
+  };
+  var star = function(x,y){
+      this.x = x;
+      this.y = y;
+      this.xWarp = random(-5,5);
+      this.fall = random(-7,-10);
+      this.r=0;
+      this.rs=random(1,4);
+  };
+  star.prototype.draw = function() {
+      if(this.y < 400){
+      pushMatrix();
+      translate(this.x,this.y);
+      rotate(this.r);
+      fill(0, 0, 0,100);
+      text("WOW",0,0);
+      popMatrix();
+      this.r+=this.rs ;
+      this.x+=this.xWarp;
+      this.y+=this.fall;
+      this.fall+=0.6;
+
+      }
+  };
+
+  var load = function(data){
+      name = data[0];
+      stat.level = data[1];
+      stat.Stars = data[2];
+      stat.NextStar = data[3];
+      stat.wins = data[4];
+      stat.loses = data[5];
+  };
+
+  var b = function(t,x,y,w,h,s,l){
+      this.newScreen = false;
+      this.x=x;
+      this.y=y;
+      this.w=w;
+      this.h=h;
+      this.s=s;
+      this.yOff = 0;
+      this.yPlus = 0;
+      this.Clicked = false;
+      this.clickTime = 0;
+      this.t = t;
+      this.move = 0;
+      this.l=l;
+      this.xOff = -x*2;
+      this.sc = "";
+  };
+  b.prototype.draw = function(canSee) {
+      this.sc = canSee;
+      textAlign(CENTER);
+      this.yOff+=this.yPlus;
+      if(this.yOff > 10){
+       this.yOff = 10;
+       this.yPlus = 0;
+      }
+
+      this.yPlus+=0.05;
+      strokeWeight(3);
+      fill(189, 0, 0);
+      rect(this.x+this.xOff,this.y,this.w,this.h,5);
+      if(mouseX > this.x && mouseY > this.y && mouseX < this.x + this.w && mouseY < this.y + this.h){
+          if(this.move > -355){
+              this.move-=25;
+          }
+          fill(163, 5, 5);
+          if(mouseIsPressed === true){
+              this.newScreen = true;
+              this.Clicked = true;
+              this.yOff = 0;
+              fill(232, 63, 63);
+              fade4 = 0;
+
+              if(this.t === "Easy"){
+                  aiMin = 8;
+                  bonus = 1;
+              }
+              if(this.t === "Hard"){
+                  aiMin = 5;
+                  bonus = 2;
+              }
+              if(this.t === "Insane"){
+                  aiMin = 2;
+                  bonus = 5;
+              }
+              if(this.t === "Classic"){
+                  type = 1;
+              }
+              if(this.t === "Rush"){
+                  type = 2;
+              }
+              if(this.t === "Reverse"){
+                  type = 3;
+              }
+
+          }
+          CURSOR = HAND;
+
+      }else{
+          CURSOR = ARROW;
+          if(this.move < 0){
+              this.move+=25;
+          }
+      }
+      if(this.Clicked === true){
+
+          if(this.clickTime > 3){
+              this.Clicked = false;
+              this.clickTime = 0;
+              if(this.t === "GO"){
+                  if(user.join("") === password){
+                      S = this.s;
+                      loggedIn = true;
+                      load(loadStuffs);
+                  }else{
+                      S = -2;
+                  }
+              }else{
+              S = this.s;
+              }
+              nameX = -200;
+          }
+          if(this.newScreen === true){
+              screens.push(new screenFlick(screens.length));
+              this.newScreen = false;
+          }
+
+          this.clickTime+= 0.1;
+      }
+
+
+      if(this.l === "**none**"){
+
+
+          rect(this.x+this.xOff,this.y-this.yOff,this.w,this.h,5);
+      textSize(12);
+          fill(92, 92, 92, 255);
+          textSize(30);
+      text(this.t, this.x+this.xOff+this.w/2,((this.y-this.yOff)+this.h/2)+13);
+      fill(0, 0, 0, 255);
+      text(this.t,this.x+this.xOff+this.w/2,((this.y-this.yOff)+this.h/2)+11);
+      }else{
+      rect(this.x+this.xOff,this.y-this.yOff,this.w,this.h,5);
+      textSize(12);
+      fill(23, 33, 232, -this.move);
+      text(this.t, this.x+this.xOff+this.w/2,(this.y-this.yOff)+13);
+      fill(0, 0, 0, -this.move);
+      text(this.l, this.x+this.xOff+this.w/2,(this.y-this.yOff)+25);
+
+      textSize(30);
+
+
+      fill(92, 92, 92, 255+this.move*2);
+      text(this.t, this.x+this.xOff+this.w/2,((this.y-this.yOff)+this.h/2)+13);
+      fill(0, 0, 0, 255+this.move*2);
+      text(this.t,this.x+this.xOff+this.w/2,((this.y-this.yOff)+this.h/2)+11);
+      }
+      strokeWeight(1);
+
+  };
+  b.prototype.passive = function(){
+      if(this.sc === S){
+          this.xOff/=1.1;
+      }else{
+          this.xOff = -this.x*2;
+      }
+  };
+  var frame = function(x,y){
+      rect(0+x,300+y,399,102);
+      line(200+x,0+y-300,200+x,400+y);
+  };
+  var clicked = function(num){
+  if(mode[num] === mode[1]){
+      if(mouseX < 200 && done === false){
+          mouseClicked = function(){
+              hasC = true;
+              player.one++;
+              player.pushOne = 0;
+              player.glowOne = 180;
+              clickS++;
+              aiClicks += 0.1;
+          };
+      }
+      clickS-=0.1;
+      if(clickS < 0){
+          clickS = 0;
+      }
+      if(clickS > 100){
+          clickS = 100;
+      }
+  }
+
+  if(mode[num] === mode[2]){
+      if(mouseX < 200 && done === false){
+          mouseClicked = function(){
+              hasC = true;
+              player.one++;
+              player.pushOne = 0;
+              player.glowOne = 180;
+              clickS++;
+              aiClicks += 0.1;
+          };
+      }
+      clickS-=0.1;
+      if(clickS < 0){
+          clickS = 0;
+      }
+      if(clickS > 100){
+          clickS = 100;
+      }
+  }
+
+  if(mode[num] === mode[3]){
+      if(mouseX < 200 && done === false){
+          mouseClicked = function(){
+              hasC= true;
+              player.two-=10;
+              player.pushOne = 0;
+              player.glowOne = 180;
+              clickS++;
+              aiClicks += 1;
+          };
+      }
+      clickS-=0.1;
+      if(clickS < 0){
+          clickS = 0;
+      }
+      if(clickS > 100){
+          clickS = 100;
+      }
+  }
+  };
+  var bar = function(x,y,type){
+      this.x=x;this.y=y;
+      this.w = 100;
+      this.h = 20;
+      this.bounce = 0;
+      this.offset = 0;
+      this.t = type;
+      this.fade = 0;
+      this.gone = false;
+      this.speed = 5;
+      this.dir = -2;
+      this.clicked = false;
+  };
+  bar.prototype.play = function(){
+      if(this.gone === false){
+      stroke(0, 0, 0,this.fade);
+      fill(171, 0, 0,this.fade);
+      rect(this.x+this.bounce,this.y,this.w-this.bounce*2,this.h);
+
+      if(this.offset+this.x <= this.x || this.offset+this.x >= this.x + this.w-10){
+          this.speed*=-1;
+      }
+      line(this.x+this.w/2,this.y-5,this.x+this.w/2,this.y+this.h+7);
+      if(this.fade > 200){
+          if(this.bounce > 45){
+              this.gone = true;
+          }
+            this.offset+=this.speed;
+            this.bounce+=0.05;
+           fill(13, 255, 0);
+           if(this.t === "player"){
+               if(this.x+this.offset > this.x+this.bounce && this.x+this.offset < this.x+this.w-this.bounce*2){
+                  if(hasC=== true){
+                      for(var i = 0; i < 10;i++){
+                          stars.push(new star(this.x+this.w/2,this.y+this.h/2));
+                      }
+
+                      fill(40, 158, 32);
+                      shake = 5;
+                      this.bounce+=15;
+                      time-=5;
+                      stat.Stars+=1*bonus;
+                  }
+               }else{
+                  if(hasC=== true){
+                      fill(40, 158, 32);
+                      shake = 0;
+                      this.gone = true;
+                      //this.bounce+=4;
+                  }
+               }
+           }
+           if(this.t === "ai"){
+               if(globalClickAi < -1){
+                  this.clicked = true;
+               }
+               if(this.x+this.offset > this.x+this.bounce && this.x+this.offset < this.x+this.w-this.bounce*2){
+                  if(floor(globalClickAi) < 0){
+                      for(var i = 0; i < 10;i++){
+                          stars.push(new star(this.x+this.w/2,this.y+this.h/2));
+                      }
+                      computer.star+=1*bonus;
+                      fill(40, 158, 32);
+                      shake = 5;
+                      this.bounce+=15;
+                      time-=5;
+                      globalClickAi = 10;
+                  }
+               }else{
+                  if(floor(globalClickAi) < 0){
+                      fill(40, 158, 32);
+                      shake = 0;
+                      this.gone = true;
+                      //this.bounce+=4;
+                  }
+               }
+               this.clicked = false;
+           }
+          rect(this.x+this.offset+1-5,this.y-5,10,this.h+10);
+
+      }
+
+      this.fade+=10;
+          if(this.fade > 255){
+              this.fade = 255;
+          }
+      }else{
+          this.fade-=1;
+      }
+  };
+  var AI = function(num){
+      var click = random(-1,aiMin-aiClicks);
+
+      if(click < 0){
+          globalClickAi = click;
+          if(mode[type] === mode[3]){
+              player.one-=10;
+          }else{
+              player.two++;
+          }
+          player.pushTwo = 0;
+          player.glowTwo = 180;
+      }
+      click = 10;
+      if(aiClicks > 0){
+          aiClicks -=0.09;
+      }
+      if(aiClicks < 0){
+          aiClicks = 0;
+      }
+      if(aiClicks >4){
+          aiClicks = 4;
+      }
+
+  };
+  var buttons = function(x,y){
+
+      player.fall/=1.1;
+
+      fill(171+player.glowOne, 0+player.glowOne, 0+player.glowOne);
+      ellipse(98+x,160+y+player.fall,119,119);
+      fill(171+player.glowTwo, 0+player.glowTwo, 0+player.glowTwo);
+      ellipse(305+x,160+y+player.fall,119,119);
+      fill(214+player.glowOne, 0+player.glowOne, 0+player.glowOne);
+      ellipse(98+x,160-player.pushOne+y+player.fall,119,119);
+      fill(214+player.glowTwo, 0+player.glowTwo, 0+player.glowTwo);
+      ellipse(305+x,160-player.pushTwo+y+player.fall,119,119);
+
+      if(player.pushOne > 10){
+          player.po = 0;
+          player.pushOne = 10;
+      }
+      if(player.pushTwo > 10){
+          player.pt = 0;
+          player.pushTwo = 10;
+      }
+      if(player.glowOne < 0){
+          player.glowOne = 0;
+      }
+      if(player.glowTwo < 0){
+          player.glowTwo = 0;
+      }
+
+      player.po+=0.02;
+      player.pt+=0.02;
+      player.pushOne+=player.po;
+      player.pushTwo+=player.pt;
+
+      player.glowOne -= 10;
+      player.glowTwo -= 10;
+  };
+  var manager = function(){
+      if(player.one > player.oneLimit){
+          for(var i = 0; i < 10;i++){
+              stars.push(new star(mouseX,mouseY));
+          }
+          waves.push(new boom(mouseX,mouseY));
+          if(mode[type] === mode[3]){
+              player.oneLimit+=500;
+          }else if(mode[type] === mode[3]){
+              player.oneLimit+=100;
+          }else{
+              player.oneLimit+=50;
+          }
+          shake = 5;
+          stat.Stars+=1*bonus;
+
+          if(mode[type] === mode[2]){
+                  var s = random(-1,-1);
+                  if(s < 0){
+                      bars.push(new bar(45,20,"player"));
+                  }
+              }
+
+
+      }
+      if(player.two > player.twoLimit){
+          for(var i = 0; i < 10;i++){
+              stars.push(new star(299,188));
+          }
+          waves.push(new boom(299,188));
+          if(mode[type] === mode[3]){
+              player.twoLimit+=500;
+          }else if(mode[type] === mode[3]){
+              player.twoLimit+=100;
+          }else{
+              player.twoLimit+=50;
+          }
+          shake = 5;
+          computer.stars+=1*bonus;
+           if(mode[type] === mode[2]){
+                  var s = random(-1,-1);
+                  if(s < 0){
+                      bars.push(new bar(260,20,"ai"));
+                  }
+              }
+      }
+      if(stat.Stars >= ceil(stat.NextStar)){
+          stat.level++;
+          stat.Stars = 0;
+          stat.NextStar+=random(2,4);
+      }
+       if(computer.stars >= ceil(computer.nextstars)){
+          computer.level++;
+          computer.stars = 0;
+          computer.nextstars+=random(2,4);
+      }
+  };
+  var flashs = 0;
+  var j = 0;
+  var game = function(){
+
+      var f = 20*sin(flashs);
+      flashs+=10;
+      var rx = random(-shake,shake);
+      var ry = random(-shake,shake);
+      strokeWeight(3);
+    manager();
+
+      if(countDown < 0 && done === false){
+          if(done === false){
+              AI();
+
+
+
+          }
+          if(mode[type] === mode[3]){
+              player.one += 3;
+              player.two +=3;
+          }
+          if(mode[type] === mode[2]){
+                  time+=0.02;
+          }
+      }else{
+          if(mode[type] === mode[2]){
+              time = 99;
+          }
+      }
+      background(255, 255-rx*10, 255-rx*10);
+       for(var i = 0; i < backdrop.length;i++){
+          backdrop[i].draw();
+      }
+      fill(255, 0, 0, f*10);
+      textSize(20);
+      if(player.one > player.two){
+      text("Winning",101,284);
+      }
+      if(player.two > player.one){
+       text("Winning",307,284);
+      }
+      fill(0, 34, 255);
+       if(mode[type] === mode[2]){
+           text(ceil(player.oneLimit-player.one) + " to go!",101,255+falling.one);
+           text(ceil(player.twoLimit-player.two) + " to go!",307,255+falling.one);
+       }
+
+
+      for(var i = 0; i < bars.length;i++){
+          bars[i].play();
+      }
+
+      clicked(type);
+      fill(255, 0, 0);
+      //text(ceil(clickS),128+rx,293+ry);
+      if(done === false){
+              player.saved = player.one;
+          }else{
+              player.one = player.saved;
+          }
+      fill(255, 255, 255);
+      frame(rx,ry+falling.one);
+      fill(0, 0, 0,120);
+      text("["+stat.level+"]"+name.join(""),107,393+falling.one);
+      text("["+computer.level+"]computer",302,393+falling.one);
+      falling.one/=1.1;
+      if(countDown > 0){
+          player.one = 0;
+          countDown -= 0.02;
+          textSize(80);
+          fill(70, 212, 84);
+          text(ceil(countDown), 200,200);
+      }else{
+       time-=0.02;
+      }
+
+      textAlign(CENTER);
+      textSize(40);
+      fill(0, 0, 0);
+      text(ceil(player.one),108+rx,365+ry+falling.one);
+      text(ceil(player.two),302+rx,365+ry+falling.one);
+      fill(255, 255, 255);
+      rect(170+rx,0+falling.two+ry,56,58);
+      falling.two/=1.1;
+      fill(9, 0, 255);
+      text(ceil(time),200+rx,48+ry+falling.two);
+      if(time < 0){
+          time = 0;
+          done = true;
+      }
+
+      buttons(rx,ry);
+
+     //println(aiClicks);
+     for(var i = 0; i < waves.length;i++){
+          waves[i].draw();
+      }
+      for(var i = 0; i < stars.length;i++){
+          stars[i].draw();
+      }
+      textSize(20);
+      fill(0, 0, 0,100);
+      text(stat.Stars+ "/"+ceil(stat.NextStar),107,324+ry+falling.one);
+      text(computer.stars+ "/"+ceil(computer.nextstars),301,324+ry+falling.one);
+      if(done === true){
+          falling.three = -200;
+          stars = [];
+          waves = [];
+          screens = [];
+          fill(255, 255, 255,fade);
+             rect(-1,-1,401,401);
+             if(player.two > player.one){
+                 fill(0, 0, 0, fade);
+                  text("You Lost...",200,200);
+                  fill(0, 0, 0, fade2);
+                      text("Your score: " + ceil(player.one),200,238);
+                      fill(0, 0, 0, fade3);
+                      text(responce.bad[ceil(j)],200,280);
+                      if(fade2 >100&& fade2 < 120){
+                      j = random(0,responce.bad.length);
+                      }
+             }
+             if(player.two < player.one){
+                 fill(0, 0, 0, fade);
+                  text("You Won!!!",200,200);
+              fill(0, 0, 0, fade2);
+                      text("Your score: " + ceil(player.one),200,238);
+                      fill(0, 0, 0, fade3);
+                      text(responce.good[ceil(j)],200,280);
+                      if(fade2 > 100 && fade2 < 120){
+                          j = random(0,responce.good.length);
+                      }
+             }
+
+
+                      if(fade2 > 200){
+                         fade3+=10;
+                      }
+                        if(fade3 > 450){
+                         fade4+=14;
+                      }
+                      if(fade4 > 255){
+
+                          if(player.two < player.one){
+                              stat.wins++;
+                          }
+                          if(player.two > player.one){
+                              stat.loses++;
+                          }
+
+                          stat.clicks.push(player.one);
+                          stat.clickSpeed.push(ceil(clickS));
+                          clickS = 0;
+                          S = 0;
+                          falling = {
+      "one": 300,
+      "two": -100
+  };
+
+                          //stat.clickSpeed.push(player.one);
+                      }
+             //if(fade < 50){
+                  fade+=5;
+                  if(fade > 255){
+                      fade2+=1;
+                  }
+
+
+      }  else{
+          fade = 0;
+          fade2 = 0;
+          fade4 = 0;
+      }
+
+  };
+  for(var i = 0; i < 14;i++){
+      for(var a = 0; a < 15;a++){
+          backdrop.push(new coolBackground((28.555*i)-12,(28.555*a)-11));
+      }
+  }
+  for(var i = 0; i < 1;i++){
+      but.push(new b("Single Player",100,152,200,54,4,"For one player only. Contains three\ngamemodes to challenge players."));
+      but.push(new b("Multi-Player",100,225,200,54,0,"For online players. Contains only\none gamemode for now."));
+
+      but.push(new b("Stats",100,300,200,54,9,"**none**"));
+
+
+      but.push(new b("Easy",100,120,200,54,2,"Computer clicks somewhat fast.\nBonus: x1"));
+      but.push(new b("Hard",100,188,200,54,2,"Computer clicks very fast.\nBonus: x2"));
+      but.push(new b("Insane",100,257,200,54,2,"Computer clicks extremely fast.\nBonus: x5"));
+      but.push(new b("Back",100,342,200,54,0,"Return to menu."));
+
+      but.push(new b("Locked",100,188,200,54,1,"????"));
+      but.push(new b("Locked",100,257,200,54,1,"????"));
+
+      but.push(new b("Classic",100,120,200,54,1,"Basic clicking battle. Very simple.\nTry to get more clicks!"));
+      but.push(new b("Rush",100,188,200,54,1,"Reach each checkpoint to drain\nthe clock faster than the computer."));
+      but.push(new b("Reverse",100,257,200,54,1,"Click  to remove points from the\ncomputer and vise versa."));
+
+      but.push(new b("Back",100,342,200,54,4,"Return to Game Modes."));
+      but.push(new b("Ok",177,322,64,54,0,"**none**"));
+      but.push(new b("Login",55,322,88,54,-2,"**none**"));
+
+      but.push(new b("GO",177,322,64,54,0,"**none**"));
+      but.push(new b("Cancel",55,322,96,54,-1,"**none**"));
+
+      but.push(new b("Leaderboard",100,140,200,54,0,"**none**"));
+      but.push(new b("Your Stats",100,209,200,54,3,"All of your stats are located here.\nBe sure to check in :)"));
+      but.push(new b("Back",100,342,200,54,0,"Return to menu."));
+      but.push(new b("Save",100,275,200,54,9,"If you have ab acount."));
+  }
+  var Menu = function(){
+      xType = true;
+      background(255, 255, 255);
+      for(var i = 0; i < backdrop.length;i++){
+          backdrop[i].draw();
+      }
+       but[0].draw(0);
+        but[1].draw(0);
+        but[2].draw(0);
+      textSize(62);
+      noStroke();
+      fill(204, 204, 204);
+      rect(-1,30,401,79);
+      fill(176, 176, 176);
+      rect(-1,30,401,10);
+      fill(92, 92, 92);
+      text("New Program", 200-nameX, 89);
+      fill(0, 0, 0);
+      text("New Program", 200-nameX, 86);
+      fade4-=5;
+
+      time = 30;
+      countDown = 5;
+
+      player = {
+        "saved" : 0,
+        "one": 0,
+        "two": 0,
+        "pushOne": 0,
+        "pushTwo": 0,
+        "po": 0,
+        "pt": 0,
+        "glowOne": 0,
+        "glowTwo": 0,
+        "oneLimit": 0,
+        "twoLimit": 0,
+        "fall" : -160
+  };
+  done = false;fade = 0; fade2 = 0; fade3 = 0;
+
+
+  };
+  var options = function(){
+      background(255, 255, 255);
+     for(var i = 0; i < backdrop.length;i++){
+          backdrop[i].draw();
+      }
+          but[3].draw(1);
+          but[12].draw(1);
+
+          if(stat.level >= 5){
+              but[4].draw(1);
+          }else{
+              but[7].draw(1);
+              textSize(14);
+              fill(255, 255, 255);
+              text("Reach level 5 to unlock 'hard'",203,229);
+          }
+          if(stat.wins >= 10){
+             but[5].draw(1);
+          }else{
+              but[8].draw(1);
+              textSize(14);
+              fill(255, 255, 255);
+              text("Win 10 times to unlock 'insane'",203,298);
+          }
+          fill(0, 0, 0);
+      textSize(62);
+      noStroke();
+      fill(204, 204, 204);
+      rect(-1,30,401,79);
+      fill(176, 176, 176);
+      rect(-1,30,401,10);
+      fill(92, 92, 92);
+      text("Difficulty", 200-nameX, 89);
+      fill(0, 0, 0);
+      text("Difficulty", 200-nameX, 86);
+      fade4-=5;
+
+      time = 30;
+      countDown = 5;
+
+      player = {
+        "saved" : 0,
+        "one": 0,
+        "two": 0,
+        "pushOne": 0,
+        "pushTwo": 0,
+        "po": 0,
+        "pt": 0,
+        "glowOne": 0,
+        "glowTwo": 0,
+        "oneLimit": 0,
+        "twoLimit": 0,
+        "fall" : -160
+  };
+  done = false;fade = 0; fade2 = 0; fade3 = 0;
+
+
+  };
+  var modes = function(){
+      background(255, 255, 255);
+     for(var i = 0; i < backdrop.length;i++){
+          backdrop[i].draw();
+      }
+          but[9].draw(4);
+          but[10].draw(4);
+          but[11].draw(4);
+          but[6].draw(4);
+
+          fill(0, 0, 0);
+      textSize(62);
+      noStroke();
+      fill(204, 204, 204);
+      rect(-1,30,401,79);
+      fill(176, 176, 176);
+      rect(-1,30,401,10);
+      fill(92, 92, 92);
+      text("Game Modes", 200-nameX, 89);
+      fill(0, 0, 0);
+      text("Game Modes", 200-nameX, 86);
+      fade4-=5;
+
+      time = 30;
+      countDown = 5;
+
+      player = {
+        "saved" : 0,
+        "one": 0,
+        "two": 0,
+        "pushOne": 0,
+        "pushTwo": 0,
+        "po": 0,
+        "pt": 0,
+        "glowOne": 0,
+        "glowTwo": 0,
+        "oneLimit": 0,
+        "twoLimit": 0,
+        "fall" : -160
+  };
+  done = false;fade = 0; fade2 = 0; fade3 = 0;
+
+
+  };
+  var averclick = 0;
+  var averspeed = 0;
+  var doneCalc = false;
+  var stats = function(){
+      if(doneCalc === false){
+      for(var i = 0;i< stat.clicks.length;i++){
+          averclick+=stat.clicks[i];
+      }
+      for(var i = 0;i< stat.clickSpeed.length;i++){
+          averspeed+=stat.clickSpeed[i];
+      }
+      averclick/=stat.clicks.length;
+      averspeed/=stat.clickSpeed.length;
+      doneCalc = true;
+      }
+
+     background(255, 255, 255);
+      for(var i = 0; i < backdrop.length;i++){
+          backdrop[i].draw();
+      }
+         but[6].draw(S);
+      textSize(62);
+      noStroke();
+      fill(204, 204, 204);
+      rect(-1,30,401,79);
+      fill(176, 176, 176);
+      rect(-1,30,401,10);
+      fill(92, 92, 92);
+      text("Your Stats", 200-nameX, 89);
+      fill(0, 0, 0);
+      text("Your Stats", 200-nameX, 86);
+      fade4-=5;
+
+      textSize(20);
+      text("Wins: " + stat.wins,70,128);
+      text("Loses: " + stat.loses,200,128);
+      text("Level: " + stat.level,330,128);
+      text("Average Clicks: " + ceil(averclick),200,166);
+      text("Average Click Speed: " + ceil(averspeed)+ "%/100%",200,196);
+      text("Stars Boosts: " + stat.Stars + "/" + ceil(stat.NextStar),200,226);
+      textSize(14);
+      text("(Exp until next level)",200,241);
+      time = 30;
+      countDown = 5;
+
+      player = {
+        "saved" : 0,
+        "one": 0,
+        "two": 0,
+        "pushOne": 0,
+        "pushTwo": 0,
+        "po": 0,
+        "pt": 0,
+        "glowOne": 0,
+        "glowTwo": 0,
+        "oneLimit": 0,
+        "twoLimit": 0,
+        "fall" : -160
+  };
+  done = false;fade = 0; fade2 = 0; fade3 = 0;
+
+
+  };
+  var STAT = function(){
+          xType = true;
+      background(255, 255, 255);
+      for(var i = 0; i < backdrop.length;i++){
+          backdrop[i].draw();
+      }
+       but[17].draw(9);
+        but[18].draw(9);
+        but[19].draw(9);
+        but[20].draw(9);
+      textSize(62);
+      noStroke();
+      fill(204, 204, 204);
+      rect(-1,30,401,79);
+      fill(176, 176, 176);
+      rect(-1,30,401,10);
+      fill(92, 92, 92);
+      text("Stats", 200-nameX, 89);
+      fill(0, 0, 0);
+      text("Stats", 200-nameX, 86);
+      fade4-=5;
+
+      time = 30;
+      countDown = 5;
+
+      player = {
+        "saved" : 0,
+        "one": 0,
+        "two": 0,
+        "pushOne": 0,
+        "pushTwo": 0,
+        "po": 0,
+        "pt": 0,
+        "glowOne": 0,
+        "glowTwo": 0,
+        "oneLimit": 0,
+        "twoLimit": 0,
+        "fall" : -160
+  };
+  done = false;fade = 0; fade2 = 0; fade3 = 0;
+
+
+  };
+  var clearEntities = function(){
+       bars = [];
+       stars = [];
+       waves = [];
+  };
+  var glideIN2 = -400;
+  var login = function(x,y){
+      fill(0, 0, 0, 100);
+      rect(-1,-1,401,401);
+      findKey2();
+      mouseClicked = function(){
+
+      };
+      fill(255, 255, 255);
+      stroke(0, 0, 0);
+      strokeWeight(4);
+      rect(x,y,300,100,6);
+      fill(143, 143, 143);
+      rect(x+79,y+40,150,41,6);
+      fill(0, 0, 0);
+      textSize(20);
+      text("Password:",x+153,y+25);
+
+     var h=round(frameCount/20);
+      if(h%2===0){
+          text(user.join("") + "|",209,67+y);
+      } else {
+          text(user.join("") + " ",209,67+y);
+      }
+      if(user.length < 1){
+          fill(209, 209, 209);
+          text("password",209,67+y);
+      }
+      textSize(12);
+      fill(0+user.length*20, 0, 0);
+      text(user.length + " / 10",208,96+y);
+  };
+  var askName = function(x,y){
+      fill(0, 0, 0, 100);
+      rect(-1,-1,401,401);
+      findKey();
+      mouseClicked = function(){
+
+      };
+      fill(255, 255, 255);
+      stroke(0, 0, 0);
+      strokeWeight(4);
+      rect(x,y,300,100,6);
+      fill(143, 143, 143);
+      rect(x+79,y+40,150,41,6);
+      fill(0, 0, 0);
+      textSize(20);
+      text("Nickname:",x+153,y+25);
+
+     var h=round(frameCount/20);
+      if(h%2===0){
+          text(name.join("") + "|",209,67+y);
+      } else {
+          text(name.join("") + " ",209,67+y);
+      }
+      if(name.length < 1){
+          fill(209, 209, 209);
+          text("Your Name",209,67+y);
+      }
+      textSize(12);
+      fill(0+name.length*20, 0, 0);
+      text(name.length + " / 10",208,96+y);
+  };
+  var glideIN = -400;
+
+  draw = function() {
+      mouseClicked = function(){
+
+      };
+      pushMatrix();
+      //scale(2);
+      smooth();
+      stroke(0, 0, 0);
+      cursor(CURSOR);
+      if(S !== 0){
+          falling.three = 100;
+      }
+      if(S === 0){
+          Menu();
+          textSize(12);
+          text(" playing as: "+name.join(""), 200,396+falling.three);
+          falling.three/=1.1;
+          clearEntities();
+      }else if(S === 1){
+          options();
+          clearEntities();
+      }else if(S === 4){
+          modes();
+          clearEntities();
+      }else if(S === 2){
+          game();
+      }else if(S === 3){
+          stats();
+          clearEntities();
+      }
+
+      if(S === 2){
+
+      }else{
+          mouseClicked = function(){
+              waves.push(new boom(mouseX,mouseY));
+          };
+      }
+      if(fade4 < 0){
+       fade4 = 0;
+      }
+
+      shake-=0.2;
+      if(shake < 0){
+       shake = 0;
+      }
+      for(var i = 0; i < waves.length;i++){
+          waves[i].draw();
+      }
+      noStroke();
+      fill(255, 255, 255, fade4);
+      rect(-1,-1,401,401);
+      //println(fade4);
+
+      hasC = false;
+      //println(floor(globalClickAi));
+
+      if(S === -1){
+      glideIN2 = -400;
+      background(255, 255, 255);
+      noStroke();
+      for(var i = 0; i < backdrop.length;i++){
+          backdrop[i].draw();
+      }
+      glideIN/=1.1;
+       glideIN2/=1.1;
+      textAlign(CENTER);
+      askName(53,179+glideIN);
+      but[13].draw(-1);
+      but[14].draw(-1);
+      xType = false;
+      xType2 = true;
+      }
+
+      if(S === -2){
+          xType2 = false;
+          xType = true;
+          glideIN = -400;
+      background(255, 255, 255);
+      noStroke();
+      for(var i = 0; i < backdrop.length;i++){
+          backdrop[i].draw();
+      }
+      glideIN/=1.1;
+      glideIN2/=1.1;
+      textAlign(CENTER);
+      login(53,179+glideIN2);
+      but[16].draw(-2);
+      but[15].draw(-2);
+      }
+
+      if(S === 9){
+          STAT();
+      }
+
+      for(var i = 0; i < screens.length;i++){
+          screens[i].draw();
+      }
+      for(var i = 0; i < but.length;i++){
+          but[i].passive();
+      }
+     nameX/=1.1;
+    if(name.length === 0 && S === 0 ){
+      name = ['P','l','a','y','e','r'];
+    }
+    if(loggedIn === true){
+        strokeWeight(4);
+        stroke(0, 0, 0);
+        if(logMessage > 1){
+        logMessage/=1.1;
+        }else{
+           logMessage-=logMove;
+           logMove+=0.4;
+        }
+        fill(255, 255, 255);
+      rect(66,184-logMessage,260,97,6);
+      fill(0, 0, 0);
+      textSize(30);
+      text("Welcome Back\n"+name.join("")+"!",199,223-logMessage);
+    }
+    popMatrix();
+    //newData(0,name.join(""),0,0,2);
+  };
+
+
+
+        }
+        if (typeof draw !== 'undefined') processing.draw = draw;
+    });
+  </script>
+</body>
+</html>

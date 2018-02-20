@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+  <script>
+  //Non named users will have player(id) as their name
+      var CWFid = 0;
+     //data: ID;NAME;LEVEL;STARS;NEXTSTAR
+      var CWFdata = [];
+     //data: ID;PASSWORD
+      var CWFlogin = [];
+      //Insert Function:
+      function newData(id,name,level,stars,nextstars){
+          CWFdata.push([id,name,level,stars,nextstars]);
+      }
+      function saveData(id,name,level,stars,nextstars){
+        var newd = [name,level,stars,nextstars];
+        for(var i=0;i<4;i++)}{
+          CWFdata[id][i+1] = newd[i];
+        }
+      }
+      function loadData(id){
+          return CWFdata[id];
+      }
+      function getData(id,data){
+          return CWFdata[id][data];
+      }
+  </script>
+</html>
